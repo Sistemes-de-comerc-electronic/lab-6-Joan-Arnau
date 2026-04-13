@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Checkout 20€</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <button id="checkout-button">Pagar 20€</button>
+  <script>
+    const stripe = Stripe("{{ stripe_publishable_key }}");
+    document.getElementById('checkout-button').addEventListener('click', async () => {
+      const resp = await fetch('{{ path('payment_create_checkout_session') }}', { method: 'POST', headers: {'Content-Type':'application/json'} });
+      const data = await resp.json();
+      if (data.url) {
+        window.location = data.url;
+      } else if (data.id) {
+        stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        alert('Error creant la sessio de pagament');
+      }
+    });
+  </script>
+</body>
+</html>
